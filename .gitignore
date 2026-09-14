@@ -4,6 +4,18 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Secretos y configuración local — NUNCA subir ###
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+src/main/resources/application.yml
+src/main/resources/application-*.yml
+!src/main/resources/application.properties.example
+!src/main/resources/application-*.properties.example
+.env
+.env.*
+!.env.example
+*.env
+
 ### STS ###
 .apt_generated
 .classpath
