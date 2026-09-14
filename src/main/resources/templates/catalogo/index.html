@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      class="h-full bg-slate-50">
+
+<!-- HEAD -->
+<head th:replace="~{layout/base :: head('Emprendimientos', 'Explora y apoya los emprendimientos estudiantiles del Politécnico Colombiano Jaime Isaza Cadavid.')}"></head>
+
+<body class="min-h-full flex flex-col text-slate-900 bg-slate-50 antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<!-- ============================================================ -->
+<!-- CONTENIDO PRINCIPAL                                          -->
+<!-- ============================================================ -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-8">
+    <section class="space-y-6">
+
+        <!-- Cabecera con contador de resultados -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Emprendimientos PCJIC</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Explora y apoya el talento comercial de los estudiantes del Politécnico Jaime Isaza Cadavid.</p>
+            </div>
+            <div class="self-start sm:self-center">
+          <span class="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+            <!-- th:text renderiza el contador que viene del controlador -->
+            <span th:text="${totalResultados} + ' ' + (${totalResultados} == 1 ? 'emprendimiento encontrado' : 'emprendimientos encontrados')">
+              0 emprendimientos encontrados
+            </span>
+          </span>
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- BARRA DE BÚSQUEDA Y FILTROS                                -->
+        <!-- El form hace GET a / — el servidor filtra y devuelve la    -->
+        <!-- misma página con los resultados                            -->
+        <!-- ========================================================== -->
+        <form id="filtros-form"
+              th:action="@{/}"
+              method="get"
+              class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+
+                <!-- 1. Búsqueda por texto -->
+                <div class="md:col-span-6 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <input
+                            type="text"
+                            id="catalog-search-input"
+                            name="q"
+                            th:value="${busqueda}"
+                            placeholder="Buscar por negocio, producto o palabra clave..."
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-colors"
+                    />
+                </div>
+
+                <!-- 2. Filtro por categoría -->
+                <div class="md:col-span-3">
+                    <select
+                            id="catalog-category-select"
+                            name="categoria"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 cursor-pointer transition-colors">
+                        <option value="">Todas las categorías</option>
+                        <!-- th:each itera las categorías que vienen de la BD -->
+                        <option
+                                th:each="cat : ${categorias}"
+                                th:value="${cat.id}"
+                                th:text="${cat.nombre}"
+                                th:selected="${cat.id == categoriaSeleccionada}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- 3. Filtro por ubicación -->
+                <div class="md:col-span-3">
+                    <select
+                            id="catalog-location-select"
+                            name="ubicacion"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 cursor-pointer transition-colors">
+                        <option value="">Toda ubicación</option>
+                        <option value="campus"   th:selected="${ubicacionSeleccionada == 'campus'}">Campus Físico PCJIC</option>
+                        <option value="virtual"  th:selected="${ubicacionSeleccionada == 'virtual'}">Tienda Virtual / Envíos</option>
+                    </select>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- ========================================================== -->
+        <!-- GRILLA DE TARJETAS DE EMPRENDIMIENTO                       -->
+        <!-- ========================================================== -->
+
+        <!-- Estado vacío: se muestra cuando no hay resultados -->
+        <div th:if="${#lists.isEmpty(emprendimientos)}"
+             class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 p-8">
+            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">No se encontraron emprendimientos</h3>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto mt-1">
+                Intenta con otros términos de búsqueda o restablece los filtros.
+            </p>
+            <a th:href="@{/}"
+               class="mt-4 inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer">
+                Restablecer filtros
+            </a>
+        </div>
+
+        <!-- Grilla: se muestra cuando hay resultados -->
+        <div th:unless="${#lists.isEmpty(emprendimientos)}"
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- th:each itera la lista de emprendimientos del controlador -->
+            <article
+                    th:each="emp : ${emprendimientos}"
+                    class="bg-white rounded-2xl border border-slate-200 overflow-hidden card-hover cursor-pointer flex flex-col group">
+
+                <!-- Enlace que envuelve la tarjeta completa -->
+                <a th:href="@{/catalogo/{slug}(slug=${emp.slug})}" class="flex flex-col flex-1">
+
+                    <!-- PORTADA con badges y logo -->
+                    <div class="relative w-full aspect-[16/9] overflow-hidden bg-slate-100 select-none">
+                        <img
+                                th:src="${emp.logoUrl} ?: '/img/placeholder-cover.jpg'"
+                                th:alt="${emp.nombre}"
+                                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                loading="lazy"
+                        />
+
+                        <!-- Badges superiores -->
+                        <div class="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 pointer-events-none">
+
+                            <!-- Categoría -->
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-900/75 text-white backdrop-blur-sm shadow-sm"
+                                  th:text="${emp.categoriaNombre}">
+                  Categoría
+                </span>
+
+                            <!-- Abierto ahora -->
+                            <span th:if="${emp.abierto}"
+                                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/90 text-white backdrop-blur-sm shadow-sm">
+                  <span class="w-2 h-2 rounded-full bg-white animate-subtle-pulse"></span>
+                  Abierto ahora
+                </span>
+
+                            <!-- Cerrado -->
+                            <span th:unless="${emp.abierto}"
+                                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800/80 text-slate-200 backdrop-blur-sm shadow-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Cerrado
+                </span>
+
+                        </div>
+
+                        <!-- Logo del emprendimiento en la esquina inferior izquierda -->
+                        <div class="absolute bottom-3 left-3 pointer-events-none">
+                            <div class="w-14 h-14 rounded-xl border-2 border-white shadow-md overflow-hidden bg-white shrink-0">
+                                <img
+                                        th:src="${emp.logoUrl} ?: '/img/placeholder-logo.jpg'"
+                                        th:alt="${emp.nombre} + ' Logo'"
+                                        class="w-full h-full object-cover"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CUERPO DE LA TARJETA -->
+                    <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-1"
+                                th:text="${emp.nombre}">
+                                Nombre del emprendimiento
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 mt-1 mb-3 leading-relaxed"
+                               th:text="${emp.descripcion}">
+                                Descripción del emprendimiento...
+                            </p>
+                        </div>
+
+                        <!-- Pie de tarjeta: ubicación + enlace -->
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-500">
+                <span class="flex items-center gap-1.5 truncate max-w-[200px]">
+                  <!-- Ícono verde si es campus físico, gris si es virtual -->
+                  <svg th:classappend="${emp.esVirtual} ? 'text-slate-400' : 'text-emerald-600'"
+                       class="w-4 h-4 shrink-0"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <span class="truncate"
+                        th:text="${emp.esVirtual} ? 'Tienda virtual' : ${emp.ubicacion}">
+                    Ubicación
+                  </span>
+                </span>
+
+                            <span class="font-medium text-emerald-700 group-hover:underline flex items-center gap-0.5 shrink-0">
+                  Ver negocio
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </span>
+                        </div>
+                    </div>
+
+                </a>
+            </article>
+
+        </div>
+
+    </section>
+</main>
+
+<!-- TOAST -->
+<div th:replace="~{layout/base :: toast}"></div>
+
+<!-- BOTTOM NAV MÓVIL -->
+<div th:replace="~{layout/base :: bottomNav}"></div>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

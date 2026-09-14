@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      class="h-full bg-slate-50">
+
+<!-- HEAD dinámico con el nombre del emprendimiento -->
+<head th:replace="~{layout/base :: head(${emp.nombre}, ${emp.descripcion})}"></head>
+
+<body class="min-h-full flex flex-col text-slate-900 bg-slate-50 antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-8">
+
+    <!-- Breadcrumb -->
+    <div class="mb-5">
+        <a th:href="@{/}"
+           class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-100">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Volver al catálogo de emprendimientos
+        </a>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- BANNER DE PORTADA                                            -->
+    <!-- ============================================================ -->
+    <div class="relative w-full h-64 sm:h-80 md:h-96 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 shadow-md mb-8">
+        <img
+                th:src="${emp.portadaUrl ?: emp.logoUrl ?: '/img/placeholder-cover.jpg'}"
+                th:alt="${emp.nombre}"
+                class="w-full h-full object-cover opacity-90"
+        />
+
+        <!-- Degradado inferior -->
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent"></div>
+
+        <!-- Badge abierto/cerrado -->
+        <div class="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <span th:if="${emp.abierto}"
+              class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-emerald-600 text-white shadow-lg backdrop-blur-md">
+          <span class="w-2.5 h-2.5 rounded-full bg-white animate-subtle-pulse"></span>
+          Abierto ahora
+        </span>
+            <span th:unless="${emp.abierto}"
+                  class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-slate-800/90 text-slate-200 shadow-lg backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+          Cerrado en este momento
+        </span>
+        </div>
+
+        <!-- Logo + título + categoría sobre el banner -->
+        <div class="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row sm:items-end gap-4">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white shrink-0">
+                <img th:src="${emp.logoUrl} ?: '/img/placeholder-logo.jpg'"
+                     th:alt="${emp.nombre}"
+                     class="w-full h-full object-cover"/>
+            </div>
+            <div class="text-white flex-1 pb-1">
+                <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="bg-emerald-700/90 text-emerald-100 text-xs font-semibold px-2.5 py-0.5 rounded-full backdrop-blur-sm border border-emerald-600/50"
+                  th:text="${emp.categoriaNombre}">
+              Categoría
+            </span>
+                    <span class="text-xs sm:text-sm text-slate-200 flex items-center gap-1">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span th:text="${emp.esVirtual} ? 'Tienda virtual' : ${emp.ubicacion}">Ubicación</span>
+            </span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight"
+                    th:text="${emp.nombre}">
+                    Nombre del emprendimiento
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- FILA: DESCRIPCIÓN + CONTACTO | HORARIO                       -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-10">
+
+        <!-- Columna principal: descripción y contacto -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Sobre el Emprendimiento</h2>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed" th:text="${emp.descripcion}">
+                    Descripción del emprendimiento...
+                </p>
+
+                <!-- Botones de contacto -->
+                <div class="mt-6 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-3">
+
+                    <!-- WhatsApp — solo si tiene contacto tipo WHATSAPP -->
+                    <a th:if="${contactoWa != null}"
+                       th:href="'https://wa.me/' + ${contactoWa} + '?text=' + ${#strings.replace('¡Hola ' + emp.nombre + '! Vi su emprendimiento en PoliShop y me gustaría obtener más información.', ' ', '%20')}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm transition-colors shadow-sm">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.971.53 1.776.792 2.795.792h.001c3.182 0 5.769-2.587 5.769-5.767.001-3.18-2.585-5.777-5.769-5.777zm3.376 8.21c-.147.414-.73.766-1.026.81-.295.045-.678.077-2.197-.552-1.815-.752-2.984-2.593-3.076-2.715-.091-.122-.734-.977-.734-1.861 0-.884.463-1.32.628-1.501.165-.181.36-.226.48-.226.12 0 .241.001.346.006.111.005.258-.042.404.308.15.361.51 1.246.554 1.337.045.09.075.196.015.316-.06.12-.09.195-.18.3-.09.105-.19.234-.271.315-.09.09-.184.188-.079.369.105.18.468.772 1.004 1.249.69.614 1.272.805 1.452.895.18.09.286.076.391-.045.106-.12.451-.526.571-.707.12-.18.241-.15.405-.09.166.06 1.052.496 1.232.586.18.09.301.135.346.21.045.076.045.436-.102.85z"/>
+                        </svg>
+                        Contactar por WhatsApp
+                    </a>
+
+                    <!-- Instagram — solo si tiene contacto tipo INSTAGRAM -->
+                    <a th:if="${contactoIg != null}"
+                       th:href="'https://instagram.com/' + ${contactoIg}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium text-sm transition-colors">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                        <span th:text="'@' + ${contactoIg}">@instagram</span>
+                    </a>
+
+                    <!-- Me gusta al emprendimiento -->
+                    <button
+                            data-liked="${meGusta}"
+                            th:data-liked="${meGusta}"
+                            onclick="PoliShop.toggleMeGusta('emprendimiento', [[${emp.id}]], this)"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium text-sm transition-all cursor-pointer">
+                        <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span data-likes th:text="${emp.totalMeGusta}">0</span>
+                        <span>Me gusta</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha: horario semanal -->
+        <div class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Horario Semanal
+                    </h2>
+                    <!-- Badge Flash activo -->
+                    <span th:if="${emp.flashActivo}"
+                          class="text-xs bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">
+              Flash Activo
+            </span>
+                </div>
+
+                <!-- th:each itera los 7 días -->
+                <div class="space-y-2.5 text-xs sm:text-sm">
+                    <div th:each="dia : ${horarios}"
+                         th:classappend="${dia.esHoy} ? 'bg-emerald-50 font-semibold text-emerald-950 border border-emerald-100' : 'text-slate-600'"
+                         class="flex items-center justify-between py-1 px-2 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <span th:text="${dia.nombre}">Lunes</span>
+                            <span th:if="${dia.esHoy}"
+                                  class="text-[10px] uppercase font-bold tracking-wider px-1.5 rounded bg-emerald-700 text-white">
+                  Hoy
+                </span>
+                        </div>
+                        <div>
+                <span th:if="${dia.activo}"
+                      th:classappend="${dia.esHoy} ? 'text-emerald-800' : 'text-slate-700'"
+                      th:text="${dia.horaApertura} + ' - ' + ${dia.horaCierre}">
+                  08:00 - 18:00
+                </span>
+                            <span th:unless="${dia.activo}" class="text-slate-400 font-normal">Cerrado</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- CATÁLOGO DE PRODUCTOS                                        -->
+    <!-- ============================================================ -->
+    <div class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Catálogo de Productos y Servicios</h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Explora lo que este estudiante emprendedor tiene disponible para ti.</p>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200"
+                  th:text="${#lists.size(productos)} + ' ' + (${#lists.size(productos)} == 1 ? 'producto' : 'productos')">
+          0 productos
+        </span>
+        </div>
+
+        <!-- Estado vacío de productos -->
+        <div th:if="${#lists.isEmpty(productos)}"
+             class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+            <p class="text-slate-500 text-sm">Este emprendimiento aún no tiene productos publicados.</p>
+        </div>
+
+        <!-- Grilla de productos -->
+        <div th:unless="${#lists.isEmpty(productos)}"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+            <div th:each="prod : ${productos}"
+                 class="bg-white rounded-2xl border border-slate-200 overflow-hidden card-hover flex flex-col justify-between cursor-pointer group">
+
+                <!-- Enlace a la vista de producto -->
+                <a th:href="@{/p/{slug}(slug=${prod.slug})}" class="flex flex-col flex-1">
+                    <div>
+                        <!-- Imagen del producto -->
+                        <div class="w-full aspect-[4/3] bg-slate-100 overflow-hidden relative select-none">
+                            <img
+                                    th:src="${prod.imagenPrincipal} ?: '/img/placeholder-product.jpg'"
+                                    th:alt="${prod.nombre}"
+                                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    loading="lazy"
+                            />
+
+                            <!-- Badges: me gusta + precio -->
+                            <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between">
+
+                                <!-- Me gusta del producto -->
+                                <button
+                                        data-liked="${prod.meGusta}"
+                                        th:data-liked="${prod.meGusta}"
+                                        onclick="event.preventDefault(); event.stopPropagation(); PoliShop.toggleMeGusta('producto', [[${prod.id}]], this)"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg backdrop-blur-md text-xs font-semibold transition-all shadow-sm bg-slate-900/60 text-white hover:bg-slate-900/80 border border-white/20 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                    <span data-likes th:text="${prod.totalMeGusta}">0</span>
+                                </button>
+
+                                <!-- Precio -->
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-900/85 text-white text-xs font-bold backdrop-blur-sm shadow-sm"
+                                      th:text="'$ ' + ${#numbers.formatInteger(prod.precio, 0, 'COMMA')} + ' COP'">
+                    $ 0 COP
+                  </span>
+                            </div>
+                        </div>
+
+                        <div class="p-4">
+                            <h3 class="font-bold text-slate-900 text-base mb-1 line-clamp-1 group-hover:text-emerald-700 transition-colors"
+                                th:text="${prod.nombre}">
+                                Nombre del producto
+                            </h3>
+                            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-2.5"
+                               th:text="${prod.descripcion}">
+                                Descripción...
+                            </p>
+                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 group-hover:underline">
+                  Ver información completa
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Botón compartir (fuera del enlace para no anidar <a>) -->
+                <div class="p-4 pt-0">
+                    <button
+                            th:data-slug="${prod.slug}"
+                            th:data-nombre="${prod.nombre}"
+                            th:data-descripcion="${prod.descripcion}"
+                            th:data-imagen="${prod.imagenPrincipal}"
+                            th:data-emprendimiento="${emp.nombre}"
+                            onclick="PoliShop.abrirShareModal(this.dataset.slug, this.dataset.nombre, this.dataset.descripcion, this.dataset.imagen, this.dataset.emprendimiento)"
+                            class="w-full py-2 px-3 rounded-xl border border-slate-200 hover:border-emerald-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50/50 text-slate-700 text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        Compartir producto
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal compartir -->
+<div id="share-modal" onclick="if(event.target===this) PoliShop.cerrarShareModal()"
+     class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Compartir Producto</h3>
+                    <p class="text-[11px] text-slate-500">Vista previa en redes sociales (OpenGraph)</p>
+                </div>
+            </div>
+            <button onclick="PoliShop.cerrarShareModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="p-5 space-y-5">
+            <!-- Preview OG -->
+            <div>
+                <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Vista Previa Generada</span>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 mb-2 pb-2 border-b border-slate-200/60">
+                        <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                        </svg>
+                        <span>polishop.elpoli.edu.co</span>
+                    </div>
+                    <div class="flex gap-3 items-center">
+                        <img id="og-preview-img" src="" alt="" class="w-20 h-20 rounded-lg object-cover border border-slate-200 shrink-0 bg-white"/>
+                        <div class="flex-1 min-w-0">
+                            <p id="og-preview-biz" class="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 truncate"></p>
+                            <h4 id="og-preview-title" class="font-bold text-slate-900 text-sm truncate"></h4>
+                            <p id="og-preview-desc" class="text-xs text-slate-600 line-clamp-2 mt-0.5"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Enlace + copiar -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Enlace Directo</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="share-url-input" readonly
+                           class="w-full px-3.5 py-2 text-xs bg-slate-50 rounded-xl border border-slate-300 text-slate-700 font-mono"/>
+                    <button onclick="PoliShop.copiarEnlace()"
+                            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs flex items-center gap-1.5 transition-colors cursor-pointer shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Copiar
+                    </button>
+                </div>
+            </div>
+            <!-- WhatsApp directo -->
+            <a id="share-whatsapp-direct" href="#" target="_blank" rel="noopener noreferrer"
+               class="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.971.53 1.776.792 2.795.792h.001c3.182 0 5.769-2.587 5.769-5.767.001-3.18-2.585-5.777-5.769-5.777z"/>
+                </svg>
+                Compartir en WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/base :: toast}"></div>
+<div th:replace="~{layout/base :: bottomNav}"></div>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

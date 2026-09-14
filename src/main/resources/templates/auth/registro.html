@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      class="h-full bg-slate-50">
+
+<head th:replace="~{layout/base :: head('Registrar emprendimiento', 'Crea tu cuenta de emprendedor en PoliShop PCJIC.')}"></head>
+
+<body class="min-h-full flex flex-col text-slate-900 bg-slate-50 antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<main class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                    PCJIC
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-900">Acceso Emprendedores</h1>
+                    <p class="text-xs text-slate-500">Exclusivo para la comunidad universitaria</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="p-5 pb-0">
+            <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-semibold">
+                <a th:href="@{/auth/login}"
+                   class="flex-1 py-2 rounded-lg text-center text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                    Iniciar Sesión
+                </a>
+                <span class="flex-1 py-2 rounded-lg text-center bg-white text-slate-900 shadow-sm">
+            Registrar Emprendimiento
+          </span>
+            </div>
+        </div>
+
+        <!-- Errores de validación del servidor -->
+        <div th:if="${errores != null and not #lists.isEmpty(errores)}"
+             class="mx-5 mt-4 p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 space-y-1">
+            <div class="flex items-center gap-1.5 font-bold">
+                <svg class="w-4 h-4 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                Corrige los siguientes errores:
+            </div>
+            <ul class="list-disc list-inside space-y-0.5 pl-1">
+                <li th:each="e : ${errores}" th:text="${e}">Error</li>
+            </ul>
+        </div>
+
+        <!-- Formulario de registro -->
+        <!-- th:object vincula el form con el RegistroForm DTO -->
+        <form th:action="@{/auth/registro}"
+              th:object="${registroForm}"
+              method="post"
+              class="p-5 space-y-4">
+
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <!-- Nombre -->
+            <div>
+                <label for="nombre"
+                       class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Nombre
+                </label>
+                <input
+                        type="text"
+                        id="nombre"
+                        th:field="*{nombre}"
+                        required
+                        placeholder="Ej. Juan"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-colors"
+                />
+            </div>
+
+            <!-- Apellido -->
+            <div>
+                <label for="apellido"
+                       class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Apellido
+                </label>
+                <input
+                        type="text"
+                        id="apellido"
+                        th:field="*{apellido}"
+                        required
+                        placeholder="Ej. Pérez"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-colors"
+                />
+            </div>
+
+            <!-- Correo institucional -->
+            <div>
+                <label for="auth-email-input"
+                       class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Correo Institucional (@elpoli.edu.co)
+                </label>
+                <input
+                        type="email"
+                        id="auth-email-input"
+                        th:field="*{correoInstitucional}"
+                        required
+                        autocomplete="email"
+                        placeholder="estudiante@elpoli.edu.co"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-colors"
+                />
+
+                <!-- Advertencia correo inválido (JS en tiempo real) -->
+                <div id="auth-email-warning"
+                     class="hidden mt-2 p-2.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2 text-xs text-red-700">
+                    <svg class="w-4 h-4 shrink-0 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                        <span class="font-bold">Acceso denegado:</span>
+                        Solo se admiten correos terminados en <span class="font-bold underline">@elpoli.edu.co</span>.
+                    </div>
+                </div>
+
+                <!-- Éxito correo válido (JS en tiempo real) -->
+                <div id="auth-email-success"
+                     class="hidden mt-2 p-2 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-2 text-xs text-emerald-800">
+                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>Correo institucional validado exitosamente.</span>
+                </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div>
+                <label for="auth-password-input"
+                       class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Contraseña
+                </label>
+                <input
+                        type="password"
+                        id="auth-password-input"
+                        th:field="*{contrasena}"
+                        required
+                        autocomplete="new-password"
+                        placeholder="Mínimo 8 caracteres"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-colors"
+                />
+            </div>
+
+            <!-- Confirmar contraseña -->
+            <div>
+                <label for="confirmarContrasena"
+                       class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Confirmar Contraseña
+                </label>
+                <input
+                        type="password"
+                        id="confirmarContrasena"
+                        th:field="*{confirmarContrasena}"
+                        required
+                        autocomplete="new-password"
+                        placeholder="Repite tu contraseña"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-colors"
+                />
+            </div>
+
+            <!-- Botón submit -->
+            <div class="pt-2">
+                <button
+                        type="submit"
+                        id="auth-submit-btn"
+                        disabled
+                        class="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition-all shadow-sm cursor-pointer opacity-50 cursor-not-allowed">
+                    Crear cuenta y verificar correo
+                </button>
+            </div>
+
+            <p class="text-[11px] text-slate-400 text-center">
+                Al registrarte recibirás un código de verificación en tu correo institucional.
+                Solo miembros de la comunidad del Politécnico Colombiano Jaime Isaza Cadavid pueden publicar emprendimientos.
+            </p>
+
+        </form>
+    </div>
+</main>
+
+<div th:replace="~{layout/base :: toast}"></div>
+<div th:replace="~{layout/base :: bottomNav}"></div>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>
