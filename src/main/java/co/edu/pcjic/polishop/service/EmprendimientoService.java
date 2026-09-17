@@ -56,7 +56,12 @@ public class EmprendimientoService {
 
         return lista.stream()
                 .filter(e -> categoriaId == null || (e.getCategoria() != null && e.getCategoria().getId().equals(categoriaId)))
-                .filter(e -> ubicacion == null || ubicacion.isBlank() || (e.getUbicacion() != null && e.getUbicacion().toLowerCase().contains(ubicacion.toLowerCase())))
+                .filter(e -> {
+                    if (ubicacion == null || ubicacion.isBlank()) return true;
+                    if ("virtual".equalsIgnoreCase(ubicacion)) return e.isEsVirtual();
+                    if ("campus".equalsIgnoreCase(ubicacion)) return !e.isEsVirtual();
+                    return true;
+                })
                 .map(e -> toDTO(e, horarioRepo.findByEmprendimientoIdOrderByDiaSemana(e.getId())))
                 .toList();
     }

@@ -155,16 +155,16 @@
             <div class="pt-2 border-t border-slate-100">
                 <h3 class="text-sm font-bold text-slate-900 mb-3">Imagen del Producto</h3>
 
-                <!-- Preview unificado: siempre presente; src inicial = imagen actual o vacío -->
+                <!-- Preview: inicialmente oculto en creación; visible en edición si ya hay imagen -->
                 <div class="mb-4 flex items-center gap-4"
                      id="preview-wrapper"
                      th:classappend="${productoForm.imagenActualUrl == null and !modoEdicion} ? 'hidden' : ''">
                     <img id="preview-imagen-principal"
-                         th:src="${productoForm.imagenActualUrl} ?: ''"
+                         th:src="${productoForm.imagenActualUrl}"
                          alt="Vista previa"
-                         class="w-24 h-24 rounded-xl object-cover border border-slate-200"/>
+                         class="w-24 h-24 rounded-xl object-cover border border-slate-200 bg-slate-100"/>
                     <p class="text-xs text-slate-400"
-                       th:text="${modoEdicion and productoForm.imagenActualUrl != null} ? 'Sube una nueva imagen para reemplazarla' : 'Vista previa'">
+                       th:text="${modoEdicion and productoForm.imagenActualUrl != null} ? 'Sube una nueva imagen para reemplazarla' : 'Vista previa de la imagen seleccionada'">
                         Vista previa
                     </p>
                 </div>

@@ -121,7 +121,8 @@
                     <button
                             data-liked="${meGusta}"
                             th:data-liked="${meGusta}"
-                            onclick="PoliShop.toggleMeGusta('emprendimiento', [[${emp.id}]], this)"
+                            th:data-id="${emp.id}"
+                            onclick="PoliShop.toggleMeGusta('emprendimiento', this.dataset.id, this)"
                             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium text-sm transition-all cursor-pointer">
                         <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
@@ -225,7 +226,8 @@
                                 <button
                                         data-liked="${prod.meGusta}"
                                         th:data-liked="${prod.meGusta}"
-                                        onclick="event.preventDefault(); event.stopPropagation(); PoliShop.toggleMeGusta('producto', [[${prod.id}]], this)"
+                                        th:data-id="${prod.id}"
+                                        onclick="event.preventDefault(); event.stopPropagation(); PoliShop.toggleMeGusta('producto', this.dataset.id, this)"
                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg backdrop-blur-md text-xs font-semibold transition-all shadow-sm bg-slate-900/60 text-white hover:bg-slate-900/80 border border-white/20 cursor-pointer">
                                     <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>

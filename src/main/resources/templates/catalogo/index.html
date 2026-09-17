@@ -130,7 +130,7 @@
                     <!-- PORTADA con badges y logo -->
                     <div class="relative w-full aspect-[16/9] overflow-hidden bg-slate-100 select-none">
                         <img
-                                th:src="${emp.logoUrl} ?: '/img/placeholder-cover.jpg'"
+                                th:src="${emp.portadaUrl ?: emp.logoUrl ?: '/img/placeholder-cover.jpg'}"
                                 th:alt="${emp.nombre}"
                                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                 loading="lazy"

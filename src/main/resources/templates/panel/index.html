@@ -252,7 +252,7 @@
                              th:src="${emp?.portadaUrl} ?: '/img/placeholder-cover.jpg'"
                              class="w-full h-28 rounded-xl object-cover border border-slate-200" alt="Portada preview"/>
                         <input type="file" id="portada" name="portada" accept="image/*"
-                               onchange="document.getElementById('preview-portada').src = URL.createObjectURL(this.files[0])"
+                               onchange="(function(f){if(!f)return;document.getElementById('preview-portada').src=URL.createObjectURL(f);})(this.files[0])"
                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"/>
                         <p class="text-[11px] text-slate-400">PNG o JPG · máx. 5 MB · proporción 3:1 recomendada</p>
                     </div>
