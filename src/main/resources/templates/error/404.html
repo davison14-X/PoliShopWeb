@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      class="h-full">
+
+<head th:replace="~{layout/base :: head('Página no encontrada', 'La página que buscas no existe en PoliShop.')}"></head>
+
+<body class="min-h-full flex flex-col antialiased page-with-bg" style="background-color: var(--color-bg); color: var(--color-text);">
+
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<main class="flex-1 flex items-center justify-center px-4 py-16">
+    <div class="text-center max-w-md animate-fade-in-up">
+
+        <!-- Número 404 grande -->
+        <div class="text-8xl sm:text-9xl font-black leading-none select-none mb-2" style="color: var(--color-border);">
+            404
+        </div>
+
+        <!-- Ícono -->
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style="background: var(--color-primary-light); color: var(--color-primary);">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold mb-2" style="color: var(--color-text);">
+            Página no encontrada
+        </h1>
+        <p class="text-sm sm:text-base leading-relaxed mb-8" style="color: var(--color-text-muted);">
+            El emprendimiento, producto o página que buscas no existe o fue removido del catálogo de PoliShop.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a th:href="@{/}"
+               class="ps-btn-primary flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Ir al catálogo
+            </a>
+            <button onclick="history.back()"
+                    class="ps-btn-secondary cursor-pointer">
+                Volver atrás
+            </button>
+        </div>
+
+    </div>
+</main>
+
+<div th:replace="~{layout/base :: bottomNav}"></div>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

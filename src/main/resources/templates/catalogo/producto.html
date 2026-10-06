@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      class="h-full">
+
+<head th:with="ogMeta=~{catalogo/producto :: ogMeta}"
+      th:replace="~{layout/base :: head(${prod.nombre}, ${prod.descripcion})}">
+</head>
+
+<th:block th:fragment="ogMeta">
+    <meta property="og:type"        content="product" />
+    <meta property="og:site_name"   content="PoliShop PCJIC" />
+    <meta property="og:title"       th:content="${prod.nombre} + ' — ' + ${prod.emprendimientoNombre}" />
+    <meta property="og:description" th:content="${prod.descripcion}" />
+    <meta property="og:image"       th:content="${prod.imagenPrincipal}" />
+    <meta property="og:url"         th:content="${urlCanonica}" />
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       th:content="${prod.nombre} + ' — ' + ${prod.emprendimientoNombre}" />
+    <meta name="twitter:description" th:content="${prod.descripcion}" />
+    <meta name="twitter:image"       th:content="${prod.imagenPrincipal}" />
+</th:block>
+
+<body class="min-h-full flex flex-col antialiased page-with-bg" style="background-color: var(--color-bg); color: var(--color-text);">
+
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-8">
+
+    <!-- Breadcrumb -->
+    <div class="mb-5 flex items-center gap-2 text-xs" style="color: var(--color-text-muted);">
+        <a th:href="@{/}" class="hover:text-emerald-700 transition-colors">Catálogo</a>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <a th:href="@{/catalogo/{slug}(slug=${prod.emprendimientoSlug})}"
+           th:text="${prod.emprendimientoNombre}"
+           class="hover:text-emerald-700 transition-colors">
+            Emprendimiento
+        </a>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="font-medium" style="color: var(--color-text);" th:text="${prod.nombre}">Producto</span>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL: imagen + info -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-10">
+
+        <!-- Columna izquierda: imagen principal -->
+        <div class="animate-fade-in-up">
+            <div class="w-full aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-sm" style="background: var(--color-input-bg); border: 1px solid var(--color-border);">
+                <img
+                        th:src="${prod.imagenPrincipal} ?: '/img/placeholder-product.jpg'"
+                        th:alt="${prod.nombre}"
+                        class="w-full h-full object-cover"
+                />
+            </div>
+
+            <div th:if="${not #lists.isEmpty(prod.imagenesAdicionales)}"
+                 class="mt-3 grid grid-cols-4 gap-2">
+                <div th:each="img : ${prod.imagenesAdicionales}"
+                     class="aspect-square rounded-xl overflow-hidden cursor-pointer transition-colors"
+                     style="border: 1px solid var(--color-border); background: var(--color-input-bg);"
+                     th:data-src="${img}"
+                     onclick="document.querySelector('.img-principal').src=this.dataset.src">
+                    <img th:src="${img}" th:alt="${prod.nombre}"
+                         class="w-full h-full object-cover"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha: info del producto -->
+        <div class="flex flex-col gap-5 animate-fade-in-up" style="animation-delay: 0.06s;">
+
+            <div>
+                <a th:href="@{/catalogo/{slug}(slug=${prod.emprendimientoSlug})}"
+                   class="inline-flex items-center gap-2 mb-3 group">
+                    <div class="w-7 h-7 rounded-lg overflow-hidden" style="border: 1px solid var(--color-border); background: var(--color-surface-solid);">
+                        <img th:src="${prod.logoEmprendimiento} ?: '/img/placeholder-logo.jpg'"
+                             th:alt="${prod.emprendimientoNombre}"
+                             class="w-full h-full object-cover"/>
+                    </div>
+                    <span class="text-xs font-semibold group-hover:text-emerald-700 transition-colors"
+                          style="color: var(--color-text-secondary);"
+                          th:text="${prod.emprendimientoNombre}">
+              Nombre del emprendimiento
+            </span>
+                    <svg class="w-3.5 h-3.5 group-hover:text-emerald-700 transition-colors" style="color: var(--color-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2"
+                    style="color: var(--color-text);"
+                    th:text="${prod.nombre}">
+                    Nombre del producto
+                </h1>
+
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="text-2xl sm:text-3xl font-black" style="color: var(--color-primary);"
+                          th:text="'$ ' + ${#numbers.formatInteger(prod.precio, 0, 'COMMA')} + ' COP'">
+              $ 0 COP
+            </span>
+
+                    <span th:if="${prod.disponible}"
+                          class="ps-badge-success inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Disponible
+            </span>
+                    <span th:unless="${prod.disponible}"
+                          class="ps-badge inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: var(--color-text-muted);"></span>
+              No disponible
+            </span>
+                </div>
+            </div>
+
+            <div class="ps-surface rounded-xl p-4">
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--color-text-muted);">Descripción</h2>
+                <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-text-secondary);" th:text="${prod.descripcion}">
+                    Descripción del producto...
+                </p>
+            </div>
+
+            <div class="space-y-3">
+
+                <a th:if="${contactoWa != null}"
+                   th:href="'https://wa.me/' + ${contactoWa} + '?text=' + ${#strings.replace('¡Hola! Vi el producto ' + prod.nombre + ' en PoliShop y me gustaría obtener más información. ' + urlCanonica, ' ', '%20')}"
+                   target="_blank" rel="noopener noreferrer"
+                   class="w-full ps-btn-primary py-3 px-5 text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.971.53 1.776.792 2.795.792h.001c3.182 0 5.769-2.587 5.769-5.767.001-3.18-2.585-5.777-5.769-5.777zm3.376 8.21c-.147.414-.73.766-1.026.81-.295.045-.678.077-2.197-.552-1.815-.752-2.984-2.593-3.076-2.715-.091-.122-.734-.977-.734-1.861 0-.884.463-1.32.628-1.501.165-.181.36-.226.48-.226.12 0 .241.001.346.006.111.005.258-.042.404.308.15.361.51 1.246.554 1.337.045.09.075.196.015.316-.06.12-.09.195-.18.3-.09.105-.19.234-.271.315-.09.09-.184.188-.079.369.105.18.468.772 1.004 1.249.69.614 1.272.805 1.452.895.18.09.286.076.391-.045.106-.12.451-.526.571-.707.12-.18.241-.15.405-.09.166.06 1.052.496 1.232.586.18.09.301.135.346.21.045.076.045.436-.102.85z"/>
+                    </svg>
+                    Pedir por WhatsApp
+                </a>
+
+                <div th:unless="${contactoWa != null}"
+                     class="w-full py-3 px-5 rounded-xl font-semibold text-sm text-center cursor-not-allowed" style="background: var(--color-input-bg); color: var(--color-text-muted); border: 1px solid var(--color-border);">
+                    Contacto no disponible
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <button
+                            th:data-liked="${meGusta}"
+                            onclick="PoliShop.toggleMeGusta('producto', [[${prod.id}]], this)"
+                            class="ps-btn-secondary py-2.5 px-4 text-sm flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span data-likes th:text="${prod.totalMeGusta}">0</span>
+                        <span>Me gusta</span>
+                    </button>
+
+                    <button
+                            th:data-slug="${prod.slug}"
+                            th:data-nombre="${prod.nombre}"
+                            th:data-descripcion="${prod.descripcion}"
+                            th:data-imagen="${prod.imagenPrincipal}"
+                            th:data-emprendimiento="${prod.emprendimientoNombre}"
+                            onclick="PoliShop.abrirShareModal(this.dataset.slug, this.dataset.nombre, this.dataset.descripcion, this.dataset.imagen, this.dataset.emprendimiento)"
+                            class="ps-btn-secondary py-2.5 px-4 text-sm flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        Compartir
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="ps-surface rounded-xl p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0" style="border: 1px solid var(--color-border); background: var(--color-input-bg);">
+                        <img th:src="${prod.logoEmprendimiento} ?: '/img/placeholder-logo.jpg'"
+                             th:alt="${prod.emprendimientoNombre}"
+                             class="w-full h-full object-cover"/>
+                    </div>
+                    <div>
+                        <p class="text-xs" style="color: var(--color-text-muted);">Publicado por</p>
+                        <p class="text-sm font-bold" style="color: var(--color-text);" th:text="${prod.emprendimientoNombre}">Emprendimiento</p>
+                    </div>
+                </div>
+                <a th:href="@{/catalogo/{slug}(slug=${prod.emprendimientoSlug})}"
+                   class="text-xs font-semibold hover:underline flex items-center gap-1" style="color: var(--color-primary);">
+                    Ver negocio
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal compartir -->
+<div id="share-modal" onclick="if(event.target===this) PoliShop.cerrarShareModal()"
+     class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="ps-surface-solid w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+        <div class="p-4 sm:p-5 flex items-center justify-between" style="border-bottom: 1px solid var(--color-border);">
+            <h3 class="text-sm sm:text-base font-bold" style="color: var(--color-text);">Compartir Producto</h3>
+            <button onclick="PoliShop.cerrarShareModal()" class="p-1.5 rounded-lg cursor-pointer" style="color: var(--color-text-muted);">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="p-5 space-y-4">
+            <div class="flex gap-3 items-center p-3 rounded-xl" style="background: var(--color-input-bg); border: 1px solid var(--color-border);">
+                <img id="og-preview-img" src="" alt="" class="w-20 h-20 rounded-lg object-cover shrink-0" style="border: 1px solid var(--color-border); background: var(--color-surface-solid);"/>
+                <div class="flex-1 min-w-0">
+                    <p id="og-preview-biz" class="text-[10px] font-semibold uppercase tracking-wider truncate" style="color: var(--color-primary);"></p>
+                    <h4 id="og-preview-title" class="font-bold text-sm truncate" style="color: var(--color-text);"></h4>
+                    <p id="og-preview-desc" class="text-xs line-clamp-2 mt-0.5" style="color: var(--color-text-secondary);"></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="text" id="share-url-input" readonly
+                       class="ps-input text-xs font-mono"/>
+                <button onclick="PoliShop.copiarEnlace()"
+                        class="ps-btn-primary px-4 py-2 text-xs shrink-0 cursor-pointer">
+                    Copiar
+                </button>
+            </div>
+            <a id="share-whatsapp-direct" href="#" target="_blank" rel="noopener noreferrer"
+               class="w-full ps-btn-primary py-2.5 px-4 text-sm flex items-center justify-center gap-2">
+                Compartir en WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/base :: toast}"></div>
+<div th:replace="~{layout/base :: bottomNav}"></div>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>
