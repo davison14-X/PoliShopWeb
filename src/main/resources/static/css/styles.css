@@ -402,6 +402,29 @@ body {
   }
 }
 
+/* Schedule cards */
+.sched-card-active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary) !important;
+  border-width: 1.5px;
+}
+.sched-card-inactive {
+  background: var(--color-input-bg);
+  opacity: 0.7;
+}
+.sched-card-inactive:hover {
+  opacity: 0.9;
+}
+
+/* Toggle switch */
+.sched-toggle .peer:checked + div {
+  background: var(--color-primary) !important;
+  opacity: 1 !important;
+}
+.sched-toggle .peer:focus-visible + div {
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
 /* ============================================================
    MODAL & OVERLAYS
    ============================================================ */
