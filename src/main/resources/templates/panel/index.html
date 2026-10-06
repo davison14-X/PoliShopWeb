@@ -88,6 +88,14 @@
                     Catalogo de Productos
                 </span>
             </a>
+            <a th:href="@{/panel?tab=cuenta}"
+               th:classappend="${tab == 'cuenta'} ? 'active' : ''"
+               class="ps-tab flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Cuenta
+            </a>
         </div>
 
         <!-- MODULO A - PERFIL Y HORARIOS -->
@@ -437,8 +445,126 @@
 
         </div>
 
+        <!-- MODULO C - CUENTA -->
+        <div th:if="${tab == 'cuenta'}" class="space-y-5">
+
+            <!-- Datos personales -->
+            <form th:action="@{/panel/cuenta}" method="post"
+                  class="ps-surface rounded-2xl p-5 sm:p-7 space-y-5 animate-fade-in-up" style="animation-delay: 0.1s;">
+
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <h2 class="text-lg font-bold pb-3" style="color: var(--color-text); border-bottom: 1px solid var(--color-border);">Datos Personales</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label for="cuenta-nombre" class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--color-text-secondary);">
+                            Nombre
+                        </label>
+                        <input type="text" id="cuenta-nombre" name="nombre"
+                               th:value="${usuario.nombre}" required
+                               class="ps-input"/>
+                    </div>
+                    <div>
+                        <label for="cuenta-apellido" class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--color-text-secondary);">
+                            Apellido
+                        </label>
+                        <input type="text" id="cuenta-apellido" name="apellido"
+                               th:value="${usuario.apellido}" required
+                               class="ps-input"/>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--color-text-secondary);">
+                        Correo Institucional
+                    </label>
+                    <input type="email"
+                           th:value="${usuario.correoInstitucional}" disabled
+                           class="ps-input opacity-60 cursor-not-allowed"/>
+                    <p class="text-[11px] mt-1.5" style="color: var(--color-text-muted);">El correo institucional no se puede modificar.</p>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button type="submit" class="ps-btn-primary cursor-pointer">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+
+            <!-- Zona de peligro -->
+            <div class="ps-surface rounded-2xl p-5 sm:p-7 space-y-4 animate-fade-in-up" style="animation-delay: 0.18s; border-color: rgba(239, 68, 68, 0.3);">
+                <div class="flex items-center gap-2 pb-3" style="border-bottom: 1px solid rgba(239, 68, 68, 0.15);">
+                    <svg class="w-5 h-5 shrink-0" style="color: #dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    <h2 class="text-lg font-bold" style="color: #dc2626;">Zona de Peligro</h2>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-sm font-bold" style="color: var(--color-text);">Eliminar cuenta permanentemente</h3>
+                        <p class="text-xs mt-1" style="color: var(--color-text-muted);">
+                            Se eliminara tu cuenta, tu emprendimiento, todos tus productos y datos asociados. Esta accion no se puede deshacer.
+                        </p>
+                    </div>
+                    <button type="button" onclick="document.getElementById('modal-eliminar-cuenta').classList.remove('hidden')"
+                            class="shrink-0 py-2 px-4 rounded-xl text-sm font-semibold cursor-pointer transition-colors"
+                            style="border: 1px solid rgba(239, 68, 68, 0.4); color: #dc2626; background: rgba(239, 68, 68, 0.06);">
+                        Eliminar mi cuenta
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </main>
+
+<!-- Modal de confirmacion para eliminar cuenta -->
+<div id="modal-eliminar-cuenta" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="ps-surface-solid rounded-2xl p-6 sm:p-8 max-w-md w-full space-y-5 animate-fade-in-up" style="border: 1px solid rgba(239, 68, 68, 0.3);">
+
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(239, 68, 68, 0.1);">
+                <svg class="w-5 h-5" style="color: #dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold" style="color: var(--color-text);">Eliminar cuenta</h3>
+                <p class="text-xs" style="color: var(--color-text-muted);">Esta accion es irreversible</p>
+            </div>
+        </div>
+
+        <p class="text-sm" style="color: var(--color-text-secondary);">
+            Se eliminara permanentemente tu cuenta, tu emprendimiento, tus productos y todos los datos asociados. No podras recuperar esta informacion.
+        </p>
+
+        <p class="text-xs font-semibold" style="color: var(--color-text-muted);">
+            Escribe <span class="font-mono px-1.5 py-0.5 rounded" style="background: rgba(239, 68, 68, 0.08); color: #dc2626;">ELIMINAR</span> para confirmar:
+        </p>
+
+        <input type="text" id="input-confirmar-eliminar" placeholder="Escribe ELIMINAR"
+               class="ps-input" style="border-color: rgba(239, 68, 68, 0.3);"
+               oninput="document.getElementById('btn-confirmar-eliminar').disabled = this.value !== 'ELIMINAR'"/>
+
+        <div class="flex items-center gap-3 pt-1">
+            <button type="button"
+                    onclick="document.getElementById('modal-eliminar-cuenta').classList.add('hidden'); document.getElementById('input-confirmar-eliminar').value='';"
+                    class="ps-btn-secondary flex-1 cursor-pointer">
+                Cancelar
+            </button>
+            <form th:action="@{/panel/cuenta/eliminar}" method="post" class="flex-1">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" id="btn-confirmar-eliminar" disabled
+                        class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        style="background: #dc2626; color: #fff; border: none;">
+                    Eliminar cuenta
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div th:replace="~{layout/base :: toast}"></div>
 <div th:replace="~{layout/base :: bottomNav}"></div>

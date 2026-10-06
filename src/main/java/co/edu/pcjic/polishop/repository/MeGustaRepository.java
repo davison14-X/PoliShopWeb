@@ -16,4 +16,10 @@ public interface MeGustaRepository extends JpaRepository<MeGusta, Long> {
     void deleteByUsuarioIdAndProductoId(Long usuarioId, Long productoId);
 
     void deleteByUsuarioIdAndEmprendimientoId(Long usuarioId, Long emprendimientoId);
+
+    void deleteByUsuarioId(Long usuarioId);
+
+    void deleteByEmprendimientoId(Long emprendimientoId);
+
+    void deleteByProductoId(Long productoId);
 }

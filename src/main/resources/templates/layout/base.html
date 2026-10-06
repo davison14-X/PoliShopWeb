@@ -156,7 +156,7 @@
             <span class="text-[10px] tracking-tight">Mi Panel</span>
         </a>
 
-        <a th:href="${#authentication != null and #authentication.isAuthenticated() and #authentication.name != 'anonymousUser'} ? '/panel' : '/auth/login'"
+        <a th:href="${#authentication != null and #authentication.isAuthenticated() and #authentication.name != 'anonymousUser'} ? '/panel?tab=cuenta' : '/auth/login'"
            th:classappend="${paginaActual == 'cuenta'} ? 'font-semibold' : ''"
            th:style="${paginaActual == 'cuenta'} ? 'color: var(--color-primary);' : 'color: var(--color-text-muted);'"
            class="flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors">

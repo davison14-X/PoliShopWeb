@@ -1,7 +1,11 @@
 package co.edu.pcjic.polishop.service;
 
 import co.edu.pcjic.polishop.dto.RegistroForm;
+import co.edu.pcjic.polishop.model.Emprendimiento;
 import co.edu.pcjic.polishop.model.Usuario;
+import co.edu.pcjic.polishop.repository.EmprendimientoRepository;
+import co.edu.pcjic.polishop.repository.MeGustaRepository;
+import co.edu.pcjic.polishop.repository.TokenVerificacionRepository;
 import co.edu.pcjic.polishop.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +24,9 @@ import java.util.List;
 public class UsuarioService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepo;
+    private final EmprendimientoRepository emprendimientoRepo;
+    private final MeGustaRepository meGustaRepo;
+    private final TokenVerificacionRepository tokenRepo;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -75,5 +82,30 @@ public class UsuarioService implements UserDetailsService {
     public Usuario findByCorreo(String correo) {
         return usuarioRepo.findByCorreoInstitucional(correo.toLowerCase())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + correo));
+    }
+
+    @Transactional
+    public void actualizarPerfil(Usuario usuario, String nombre, String apellido) {
+        usuario.setNombre(nombre.trim());
+        usuario.setApellido(apellido.trim());
+        usuarioRepo.save(usuario);
+    }
+
+    @Transactional
+    public void eliminarCuenta(Usuario usuario) {
+        Long uid = usuario.getId();
+
+        List<Emprendimiento> emps = emprendimientoRepo.findByUsuarioId(uid);
+        for (Emprendimiento emp : emps) {
+            for (var prod : emp.getProductos()) {
+                meGustaRepo.deleteByProductoId(prod.getId());
+            }
+            meGustaRepo.deleteByEmprendimientoId(emp.getId());
+            emprendimientoRepo.delete(emp);
+        }
+
+        meGustaRepo.deleteByUsuarioId(uid);
+        tokenRepo.deleteByUsuarioId(uid);
+        usuarioRepo.delete(usuario);
     }
 }

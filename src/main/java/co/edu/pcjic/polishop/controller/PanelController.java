@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class PanelController {
 
         model.addAttribute("categorias", categoriaRepo.findAll());
         model.addAttribute("tab", tab);
-        model.addAttribute("paginaActual", "panel");
+        model.addAttribute("paginaActual", "cuenta".equals(tab) ? "cuenta" : "panel");
 
         return "panel/index";
     }
@@ -206,12 +208,37 @@ public class PanelController {
                                    RedirectAttributes ra) {
         Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
         Emprendimiento emp = emprendimientoService.findByUsuario(usuario);
-        // Verifica propiedad antes de eliminar (lanza 403 si no pertenece al usuario)
         if (emp != null) {
             productoService.findByIdForOwner(id, emp.getId());
             productoService.eliminar(id);
             ra.addFlashAttribute("exito", "Producto eliminado.");
         }
         return "redirect:/panel?tab=productos";
+    }
+
+    // ── Actualizar datos personales ───────────────────────────
+    @PostMapping("/cuenta")
+    public String actualizarCuenta(@AuthenticationPrincipal UserDetails userDetails,
+                                   @RequestParam String nombre,
+                                   @RequestParam String apellido,
+                                   RedirectAttributes ra) {
+        if (nombre == null || nombre.isBlank() || apellido == null || apellido.isBlank()) {
+            ra.addFlashAttribute("error", "El nombre y apellido son obligatorios.");
+            return "redirect:/panel?tab=cuenta";
+        }
+        Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
+        usuarioService.actualizarPerfil(usuario, nombre, apellido);
+        ra.addFlashAttribute("exito", "Datos personales actualizados correctamente.");
+        return "redirect:/panel?tab=cuenta";
+    }
+
+    // ── Eliminar cuenta ───────────────────────────────────────
+    @PostMapping("/cuenta/eliminar")
+    public String eliminarCuenta(@AuthenticationPrincipal UserDetails userDetails,
+                                 HttpServletRequest request) {
+        Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
+        usuarioService.eliminarCuenta(usuario);
+        request.getSession().invalidate();
+        return "redirect:/?cuenta_eliminada";
     }
 }
