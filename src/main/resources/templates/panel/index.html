@@ -10,7 +10,7 @@
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-8">
-    <div class="max-w-5xl mx-auto space-y-6">
+    <div class="max-w-5xl mx-auto space-y-4">
 
         <!-- HEADER DEL PANEL -->
         <div class="ps-surface rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in-up">
@@ -53,15 +53,12 @@
             </a>
         </div>
 
-        <!-- Mensaje de exito o error -->
-        <div th:if="${exito != null and !#strings.isEmpty(exito)}"
-             class="p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-fade-in-up"
-             style="background: var(--color-primary-light); border: 1px solid rgba(4, 120, 87, 0.2); color: var(--color-primary-text);">
-            <svg class="w-4 h-4 shrink-0" style="color: var(--color-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span th:text="${exito}">Cambios guardados exitosamente.</span>
-        </div>
+        <!-- Mensaje de exito (toast flotante) -->
+        <script th:if="${exito != null and !#strings.isEmpty(exito)}" th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', () => Toast.show(/*[[${exito}]]*/, 'success'));
+        </script>
+
+        <!-- Mensaje de error (estático) -->
         <div th:if="${error != null and !#strings.isEmpty(error)}"
              class="p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-fade-in-up"
              style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #dc2626;">
@@ -94,10 +91,10 @@
         </div>
 
         <!-- MODULO A - PERFIL Y HORARIOS -->
-        <div th:if="${tab == 'perfil'}" class="space-y-6">
+        <div th:if="${tab == 'perfil'}" class="space-y-4">
 
             <!-- Toggle disponibilidad flash -->
-            <div class="ps-surface rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up" style="animation-delay: 0.1s;"
+            <div class="ps-surface rounded-2xl p-4 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up" style="animation-delay: 0.1s;"
                  th:style="${emp?.flashActivo} ? 'border-color: rgba(4, 120, 87, 0.35); background: var(--color-primary-light);' : ''">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
@@ -130,7 +127,7 @@
             <!-- Formulario de perfil -->
             <form th:action="@{/panel/perfil}" method="post"
                   enctype="multipart/form-data"
-                  class="ps-surface rounded-2xl p-5 sm:p-7 space-y-6 animate-fade-in-up" style="animation-delay: 0.14s;">
+                  class="ps-surface rounded-2xl p-7 sm:p-7 space-y-4 animate-fade-in-up" style="animation-delay: 0.14s;">
 
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <h2 class="text-lg font-bold pb-3" style="color: var(--color-text); border-bottom: 1px solid var(--color-border);">Informacion del Negocio</h2>

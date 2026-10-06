@@ -26,9 +26,14 @@ public class AuthController {
 
     // ── Login ────────────────────────────────────────────────
     @GetMapping("/login")
-    public String loginForm(@RequestParam(required = false) String error, Model model) {
+    public String loginForm(@RequestParam(required = false) String error, Model model, HttpSession session) {
         if (error != null) {
             model.addAttribute("error", "Correo o contraseña incorrectos, o cuenta no verificada.");
+            String lastEmail = (String) session.getAttribute("lastEmail");
+            if (lastEmail != null) {
+                model.addAttribute("lastEmail", lastEmail);
+                session.removeAttribute("lastEmail");
+            }
         }
         return "auth/login";
     }

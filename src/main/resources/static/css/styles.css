@@ -415,12 +415,6 @@ body {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-/* ============================================================
-   SAFE AREA - dispositivos con barra de gestos
-   ============================================================ */
-.pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.5rem);
-}
 
 /* ============================================================
    SCROLLBARS

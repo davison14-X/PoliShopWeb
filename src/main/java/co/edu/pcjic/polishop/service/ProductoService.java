@@ -58,8 +58,13 @@ public class ProductoService {
 
     @Transactional(readOnly = true)
     public List<ProductoDTO> listarDisponiblesPorEmprendimiento(Long empId) {
+        return listarDisponiblesPorEmprendimiento(empId, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductoDTO> listarDisponiblesPorEmprendimiento(Long empId, Long usuarioId) {
         return productoRepo.findByEmprendimientoIdAndDisponibleTrue(empId)
-                .stream().map(this::toDTO).toList();
+                .stream().map(p -> toDTO(p, usuarioId)).toList();
     }
 
     @Transactional
@@ -108,10 +113,15 @@ public class ProductoService {
     }
 
     public ProductoDTO toDTO(Producto p) {
+        return toDTO(p, null);
+    }
+
+    public ProductoDTO toDTO(Producto p, Long usuarioId) {
         List<String> urls = p.getImagenes().stream().map(ImagenProducto::getUrl).toList();
         String principal = urls.isEmpty() ? null : urls.get(0);
         List<String> adicionales = urls.size() > 1 ? urls.subList(1, urls.size()) : List.of();
         long likes = meGustaRepo.countByProductoId(p.getId());
+        boolean liked = usuarioId != null && meGustaRepo.existsByUsuarioIdAndProductoId(usuarioId, p.getId());
 
         return ProductoDTO.builder()
                 .id(p.getId())
@@ -126,7 +136,7 @@ public class ProductoService {
                 .emprendimientoSlug(p.getEmprendimiento().getSlug())
                 .logoEmprendimiento(p.getEmprendimiento().getLogoUrl())
                 .totalMeGusta(likes)
-                .meGusta(false)
+                .meGusta(liked)
                 .build();
     }
 }

@@ -46,7 +46,10 @@ public class SecurityConfig {
                 .usernameParameter("correoInstitucional")
                 .passwordParameter("contrasena")
                 .defaultSuccessUrl("/panel", true)
-                .failureUrl("/auth/login?error")
+                .failureHandler((request, response, exception) -> {
+                    request.getSession().setAttribute("lastEmail", request.getParameter("correoInstitucional"));
+                    response.sendRedirect(request.getContextPath() + "/auth/login?error");
+                })
                 .permitAll()
             )
             .logout(logout -> logout

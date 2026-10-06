@@ -13,9 +13,9 @@
     <div class="ps-surface w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
 
         <!-- Header -->
-        <div class="p-5 flex items-center justify-between" style="border-bottom: 1px solid var(--color-border);">
+        <div class="p-4 flex items-center justify-between" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs" style="background: var(--color-primary-light); color: var(--color-primary-text);">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs" style="background: var(--color-primary-light); color: var(--color-primary-text);">
                     PCJIC
                 </div>
                 <div>
@@ -26,7 +26,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="p-5 pb-0">
+        <div class="p-3 pb-0">
             <div class="p-1 rounded-xl flex items-center text-xs font-semibold ps-tab-bar">
                 <a th:href="@{/auth/login}"
                    class="ps-tab cursor-pointer">
@@ -56,7 +56,7 @@
         <form th:action="@{/auth/registro}"
               th:object="${registroForm}"
               method="post"
-              class="p-5 space-y-4">
+              class="p-5 pt-1 space-y-4">
 
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
@@ -119,13 +119,6 @@
                     </div>
                 </div>
 
-                <div id="auth-email-success"
-                     class="hidden mt-2 p-2 rounded-xl flex items-center gap-2 text-xs" style="background: var(--color-primary-light); border: 1px solid rgba(16,185,129,0.2); color: var(--color-primary-text);">
-                    <svg class="w-4 h-4 shrink-0" style="color: var(--color-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <span>Correo institucional validado exitosamente.</span>
-                </div>
             </div>
 
             <!-- Contraseña -->
@@ -167,8 +160,7 @@
                 <button
                         type="submit"
                         id="auth-submit-btn"
-                        disabled
-                        class="w-full ps-btn-primary opacity-50 cursor-not-allowed">
+                        class="w-full ps-btn-primary">
                     Crear cuenta y verificar correo
                 </button>
             </div>

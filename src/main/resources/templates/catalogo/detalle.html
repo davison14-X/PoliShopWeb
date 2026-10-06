@@ -112,7 +112,6 @@
                     </a>
 
                     <button
-                            data-liked="${meGusta}"
                             th:data-liked="${meGusta}"
                             th:data-id="${emp.id}"
                             onclick="PoliShop.toggleMeGusta('emprendimiento', this.dataset.id, this)"
@@ -208,7 +207,6 @@
 
                             <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between">
                                 <button
-                                        data-liked="${prod.meGusta}"
                                         th:data-liked="${prod.meGusta}"
                                         th:data-id="${prod.id}"
                                         onclick="event.preventDefault(); event.stopPropagation(); PoliShop.toggleMeGusta('producto', this.dataset.id, this)"

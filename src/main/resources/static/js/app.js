@@ -58,19 +58,18 @@ const Auth = {
    * @returns {boolean}
    */
   validarCorreo(correo) {
-    const warning = document.getElementById('auth-email-warning');
-    const success = document.getElementById('auth-email-success');
-    const btn     = document.getElementById('auth-submit-btn');
-    const valido  = correo.toLowerCase().endsWith(this.DOMINIO) && correo.length > this.DOMINIO.length;
+    return correo.toLowerCase().endsWith(this.DOMINIO) && correo.length > this.DOMINIO.length;
+  },
 
-    warning?.classList.toggle('hidden', valido || correo === '');
-    success?.classList.toggle('hidden', !valido);
-    if (btn) {
-      btn.disabled = !valido;
-      btn.classList.toggle('opacity-50', !valido);
-      btn.classList.toggle('cursor-not-allowed', !valido);
+  validarFormulario(e) {
+    const correo = document.getElementById('auth-email-input')?.value.trim() || '';
+    const warning = document.getElementById('auth-email-warning');
+    if (!this.validarCorreo(correo)) {
+      e.preventDefault();
+      warning?.classList.remove('hidden');
+    } else {
+      warning?.classList.add('hidden');
     }
-    return valido;
   },
 
   switchTab(tab) {
@@ -105,9 +104,6 @@ const Auth = {
     document.getElementById('auth-email-input').value    = '';
     document.getElementById('auth-password-input').value = '';
     document.getElementById('auth-email-warning')?.classList.add('hidden');
-    document.getElementById('auth-email-success')?.classList.add('hidden');
-    const btn = document.getElementById('auth-submit-btn');
-    if (btn) { btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed'); }
     modal.classList.remove('hidden');
   },
 
@@ -336,8 +332,37 @@ const ThemeToggle = {
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('auth-email-input')
-    ?.addEventListener('input', e => Auth.validarCorreo(e.target.value.trim()));
+  document.querySelector('form[action*="/auth/login"]')
+    ?.addEventListener('submit', e => Auth.validarFormulario(e));
+  document.querySelector('form[action*="/auth/registro"]')
+    ?.addEventListener('submit', e => Auth.validarFormulario(e));
+
+  const regPass = document.getElementById('auth-password-input');
+  const regConfirm = document.getElementById('confirmarContrasena');
+  if (regPass && regConfirm && document.querySelector('form[action*="/auth/registro"]')) {
+    const checkMatch = () => {
+      const pass = regPass.value;
+      const confirm = regConfirm.value;
+      [regPass, regConfirm].forEach(inp => {
+        inp.style.borderColor = '';
+        inp.style.boxShadow = '';
+      });
+      if (confirm.length === 0) return;
+      if (pass === confirm) {
+        [regPass, regConfirm].forEach(inp => {
+          inp.style.borderColor = '#10b981';
+          inp.style.boxShadow = '0 0 0 2px rgba(16,185,129,0.25)';
+        });
+      } else {
+        [regPass, regConfirm].forEach(inp => {
+          inp.style.borderColor = '#ef4444';
+          inp.style.boxShadow = '0 0 0 2px rgba(239,68,68,0.25)';
+        });
+      }
+    };
+    regPass.addEventListener('input', checkMatch);
+    regConfirm.addEventListener('input', checkMatch);
+  }
 
   MeGusta.inicializarEstilos();
   Catalogo.init();

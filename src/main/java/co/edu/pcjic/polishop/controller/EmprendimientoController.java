@@ -47,13 +47,15 @@ public class EmprendimientoController {
                 .findFirst().orElse(null);
 
         boolean meGusta = false;
+        Long usuarioId = null;
         if (userDetails != null) {
             Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
-            meGusta = meGustaRepo.existsByUsuarioIdAndEmprendimientoId(usuario.getId(), emp.getId());
+            usuarioId = usuario.getId();
+            meGusta = meGustaRepo.existsByUsuarioIdAndEmprendimientoId(usuarioId, emp.getId());
         }
 
         model.addAttribute("emp", emprendimientoService.toDTO(emp, horarios));
-        model.addAttribute("productos", productoService.listarDisponiblesPorEmprendimiento(emp.getId()));
+        model.addAttribute("productos", productoService.listarDisponiblesPorEmprendimiento(emp.getId(), usuarioId));
         model.addAttribute("horarios", emprendimientoService.buildHorarioDTOs(horarios));
         model.addAttribute("contactoWa", contactoWa);
         model.addAttribute("contactoIg", contactoIg);
