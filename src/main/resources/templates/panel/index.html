@@ -491,8 +491,28 @@
                 </div>
             </form>
 
+            <!-- Seguridad - Cambiar contraseña -->
+            <div class="ps-surface rounded-2xl p-5 sm:p-7 animate-fade-in-up" style="animation-delay: 0.14s;">
+                <h2 class="text-lg font-bold pb-3 mb-4" style="color: var(--color-text); border-bottom: 1px solid var(--color-border);">Seguridad</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-sm font-bold" style="color: var(--color-text);">Cambiar contraseña</h3>
+                        <p class="text-xs mt-1" style="color: var(--color-text-muted);">
+                            Actualiza tu contraseña para mantener tu cuenta segura.
+                        </p>
+                    </div>
+                    <button type="button" onclick="document.getElementById('modal-cambiar-contrasena').classList.remove('hidden')"
+                            class="ps-btn-secondary shrink-0 flex items-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Cambiar contraseña
+                    </button>
+                </div>
+            </div>
+
             <!-- Zona de peligro -->
-            <div class="ps-surface rounded-2xl p-5 sm:p-7 space-y-4 animate-fade-in-up" style="animation-delay: 0.18s; border-color: rgba(239, 68, 68, 0.3);">
+            <div class="ps-surface rounded-2xl p-5 sm:p-7 space-y-4 animate-fade-in-up" style="animation-delay: 0.22s; border-color: rgba(239, 68, 68, 0.3);">
                 <div class="flex items-center gap-2 pb-3" style="border-bottom: 1px solid rgba(239, 68, 68, 0.15);">
                     <svg class="w-5 h-5 shrink-0" style="color: #dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
@@ -565,6 +585,121 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de cambiar contraseña -->
+<div id="modal-cambiar-contrasena" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="ps-surface-solid rounded-2xl p-6 sm:p-8 max-w-md w-full space-y-5 animate-fade-in-up" style="border: 1px solid var(--color-border);">
+
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: var(--color-primary-light);">
+                <svg class="w-5 h-5" style="color: var(--color-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold" style="color: var(--color-text);">Cambiar contraseña</h3>
+                <p class="text-xs" style="color: var(--color-text-muted);">Ingresa tu contraseña actual y la nueva</p>
+            </div>
+        </div>
+
+        <div id="modal-contrasena-error" class="hidden p-3 rounded-xl flex items-center gap-2 text-xs font-medium"
+             style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #dc2626;">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span id="modal-contrasena-error-msg">Error</span>
+        </div>
+
+        <form th:action="@{/panel/cuenta/contrasena}" method="post" id="form-cambiar-contrasena" class="space-y-4">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <div>
+                <label for="contrasena-actual" class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--color-text-secondary);">
+                    Contraseña actual
+                </label>
+                <input type="password" id="contrasena-actual" name="contrasenaActual" required
+                       class="ps-input"/>
+            </div>
+
+            <div>
+                <label for="contrasena-nueva" class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--color-text-secondary);">
+                    Nueva contraseña
+                </label>
+                <input type="password" id="contrasena-nueva" name="contrasenaNueva" required
+                       class="ps-input"/>
+            </div>
+
+            <div>
+                <label for="contrasena-confirmar" class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--color-text-secondary);">
+                    Confirmar nueva contraseña
+                </label>
+                <input type="password" id="contrasena-confirmar" name="contrasenaConfirmar" required
+                       class="ps-input"/>
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+                <button type="button"
+                        onclick="cerrarModalContrasena()"
+                        class="ps-btn-secondary flex-1 cursor-pointer">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="ps-btn-primary flex-1 cursor-pointer">
+                    Cambiar contraseña
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function cerrarModalContrasena() {
+    document.getElementById('modal-cambiar-contrasena').classList.add('hidden');
+    document.getElementById('form-cambiar-contrasena').reset();
+    document.getElementById('modal-contrasena-error').classList.add('hidden');
+}
+
+document.getElementById('form-cambiar-contrasena').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = this;
+    var errorBox = document.getElementById('modal-contrasena-error');
+    var errorMsg = document.getElementById('modal-contrasena-error-msg');
+    var btn = form.querySelector('button[type="submit"]');
+    var btnText = btn.textContent;
+
+    errorBox.classList.add('hidden');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
+    var data = new FormData(form);
+    var csrf = document.querySelector('meta[name="_csrf"]').content;
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: { [csrfHeader]: csrf },
+        body: new URLSearchParams(data)
+    })
+    .then(function(res) { return res.json().then(function(j) { return { ok: res.ok, body: j }; }); })
+    .then(function(res) {
+        btn.disabled = false;
+        btn.textContent = btnText;
+        if (res.ok) {
+            cerrarModalContrasena();
+            if (typeof Toast !== 'undefined') Toast.show(res.body.ok, 'success');
+        } else {
+            errorMsg.textContent = res.body.error;
+            errorBox.classList.remove('hidden');
+        }
+    })
+    .catch(function() {
+        btn.disabled = false;
+        btn.textContent = btnText;
+        errorMsg.textContent = 'Ocurrio un error inesperado. Intentalo de nuevo.';
+        errorBox.classList.remove('hidden');
+    });
+});
+</script>
 
 <div th:replace="~{layout/base :: toast}"></div>
 <div th:replace="~{layout/base :: bottomNav}"></div>

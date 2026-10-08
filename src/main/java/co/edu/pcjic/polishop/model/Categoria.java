@@ -17,6 +17,6 @@ public class Categoria {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(length = 10)
+    @Column(length = 100)
     private String icono;
 }

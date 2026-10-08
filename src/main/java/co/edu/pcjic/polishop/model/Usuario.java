@@ -21,10 +21,10 @@ public class Usuario {
     @Column(name = "correo_institucional", nullable = false, unique = true, length = 150)
     private String correoInstitucional;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 80)
     private String nombre;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 80)
     private String apellido;
 
     @Column(name = "contrasena_hash", nullable = false)

@@ -260,18 +260,104 @@ const Catalogo = {
     const search = document.getElementById('catalog-search-input');
     const cat    = document.getElementById('catalog-category-select');
     const loc    = document.getElementById('catalog-location-select');
-    if (!form) return;
+    const grid   = document.getElementById('catalog-grid');
+    const empty  = document.getElementById('catalog-empty');
+    const badge  = document.getElementById('catalog-count-badge');
+    if (!form || !grid) return;
 
-    // Búsqueda en tiempo real con debounce (500ms)
-    let debounce;
+    let debounceTimer;
+    let controller;
+
+    function buscar() {
+      if (controller) controller.abort();
+      controller = new AbortController();
+
+      const params = new URLSearchParams();
+      const q = search?.value?.trim();
+      if (q) params.set('q', q);
+      if (cat?.value) params.set('categoria', cat.value);
+      if (loc?.value) params.set('ubicacion', loc.value);
+
+      fetch('/api/catalogo/buscar?' + params.toString(), { signal: controller.signal })
+        .then(r => r.json())
+        .then(data => {
+          if (badge) {
+            badge.textContent = data.length + ' ' + (data.length === 1 ? 'emprendimiento encontrado' : 'emprendimientos encontrados');
+          }
+          if (data.length === 0) {
+            grid.innerHTML = '';
+            grid.classList.add('hidden');
+            if (empty) empty.classList.remove('hidden');
+            return;
+          }
+          if (empty) empty.classList.add('hidden');
+          grid.classList.remove('hidden');
+          grid.innerHTML = data.map((emp, i) => Catalogo.renderCard(emp, i)).join('');
+        })
+        .catch(e => { if (e.name !== 'AbortError') console.error(e); });
+    }
+
     search?.addEventListener('input', () => {
-      clearTimeout(debounce);
-      debounce = setTimeout(() => form.submit(), 500);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(buscar, 200);
     });
 
-    // Filtros disparan submit inmediato
-    cat?.addEventListener('change', () => form.submit());
-    loc?.addEventListener('change', () => form.submit());
+    cat?.addEventListener('change', buscar);
+    loc?.addEventListener('change', buscar);
+
+    form.addEventListener('submit', e => e.preventDefault());
+  },
+
+  renderCard(emp, index) {
+    const cover = emp.portadaUrl || emp.logoUrl || '/img/placeholder-cover.jpg';
+    const logo = emp.logoUrl || '/img/placeholder-logo.jpg';
+    const ubicText = emp.esVirtual ? 'Tienda virtual' : (emp.ubicacion || '');
+    const locColor = emp.esVirtual ? 'color: var(--color-text-muted);' : 'color: var(--color-primary);';
+    const statusBadge = emp.abierto
+      ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/90 text-white backdrop-blur-sm shadow-sm">
+           <span class="w-2 h-2 rounded-full bg-white animate-subtle-pulse"></span>Abierto ahora
+         </span>`
+      : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-slate-200 backdrop-blur-sm shadow-sm">
+           <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Cerrado
+         </span>`;
+
+    return `<article class="ps-surface rounded-2xl overflow-hidden card-hover cursor-pointer flex flex-col group stagger-item" style="animation-delay:${index * 0.04}s;">
+      <a href="/catalogo/${emp.slug}" class="flex flex-col flex-1">
+        <div class="relative w-full aspect-[16/9] overflow-hidden select-none" style="background: var(--color-badge-bg);">
+          <img src="${cover}" alt="${emp.nombre}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy"/>
+          <div class="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 pointer-events-none">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900/75 text-white backdrop-blur-sm shadow-sm">${emp.categoriaNombre || ''}</span>
+            ${statusBadge}
+          </div>
+          <div class="absolute bottom-3 left-3 pointer-events-none">
+            <div class="w-14 h-14 rounded-xl border-2 border-white shadow-md overflow-hidden bg-white shrink-0">
+              <img src="${logo}" alt="${emp.nombre} Logo" class="w-full h-full object-cover"/>
+            </div>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold line-clamp-1 transition-colors" style="color: var(--color-text);">${emp.nombre}</h3>
+            <p class="text-xs sm:text-sm line-clamp-2 mt-1 mb-3 leading-relaxed" style="color: var(--color-text-secondary);">${emp.descripcion || ''}</p>
+          </div>
+          <div class="pt-3 flex items-center justify-between gap-2 text-xs" style="border-top: 1px solid var(--color-border); color: var(--color-text-muted);">
+            <span class="flex items-center gap-1.5 truncate max-w-[200px]">
+              <svg style="${locColor}" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span class="truncate">${ubicText}</span>
+            </span>
+            <span class="font-medium flex items-center gap-0.5 shrink-0 group-hover:gap-1.5 transition-all" style="color: var(--color-primary);">
+              Ver negocio
+              <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </a>
+    </article>`;
   },
 };
 
@@ -362,6 +448,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     regPass.addEventListener('input', checkMatch);
     regConfirm.addEventListener('input', checkMatch);
+  }
+
+  const modalPass = document.getElementById('contrasena-nueva');
+  const modalConfirm = document.getElementById('contrasena-confirmar');
+  if (modalPass && modalConfirm) {
+    const checkModalMatch = () => {
+      const pass = modalPass.value;
+      const confirm = modalConfirm.value;
+      [modalPass, modalConfirm].forEach(inp => {
+        inp.style.borderColor = '';
+        inp.style.boxShadow = '';
+      });
+      if (confirm.length === 0) return;
+      if (pass === confirm) {
+        [modalPass, modalConfirm].forEach(inp => {
+          inp.style.borderColor = '#10b981';
+          inp.style.boxShadow = '0 0 0 2px rgba(16,185,129,0.25)';
+        });
+      } else {
+        [modalPass, modalConfirm].forEach(inp => {
+          inp.style.borderColor = '#ef4444';
+          inp.style.boxShadow = '0 0 0 2px rgba(239,68,68,0.25)';
+        });
+      }
+    };
+    modalPass.addEventListener('input', checkModalMatch);
+    modalConfirm.addEventListener('input', checkModalMatch);
   }
 
   MeGusta.inicializarEstilos();

@@ -21,7 +21,7 @@ public class TokenVerificacion {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @Column(nullable = false, length = 6)
+    @Column(nullable = false, length = 10)
     private String codigo;
 
     @Column(nullable = false, columnDefinition = "TINYINT")

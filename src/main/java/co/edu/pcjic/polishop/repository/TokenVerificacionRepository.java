@@ -12,4 +12,8 @@ public interface TokenVerificacionRepository extends JpaRepository<TokenVerifica
             Long usuarioId, LocalDateTime ahora);
 
     void deleteByUsuarioId(Long usuarioId);
+
+    void deleteByExpiraEnBeforeAndUsadoTrue(LocalDateTime limite);
+
+    void deleteByExpiraEnBefore(LocalDateTime limite);
 }

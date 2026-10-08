@@ -37,7 +37,8 @@ public class SecurityConfig {
                     "/auth/login", "/auth/registro", "/auth/verificar", "/auth/reenviar-codigo",
                     "/css/**", "/js/**", "/img/**", "/favicon.ico",
                     "/error",
-                    "/api/me-gusta/**"
+                    "/api/me-gusta/**",
+                    "/api/catalogo/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

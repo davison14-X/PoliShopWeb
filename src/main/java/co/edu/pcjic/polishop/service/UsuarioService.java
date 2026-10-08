@@ -92,6 +92,21 @@ public class UsuarioService implements UserDetailsService {
     }
 
     @Transactional
+    public void cambiarContrasena(Usuario usuario, String actual, String nueva, String confirmar) {
+        if (!passwordEncoder.matches(actual, usuario.getContrasenaHash())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta.");
+        }
+        if (nueva == null || nueva.length() < 8) {
+            throw new IllegalArgumentException("La nueva contraseña debe tener al menos 8 caracteres.");
+        }
+        if (!nueva.equals(confirmar)) {
+            throw new IllegalArgumentException("Las contraseñas nuevas no coinciden.");
+        }
+        usuario.setContrasenaHash(passwordEncoder.encode(nueva));
+        usuarioRepo.save(usuario);
+    }
+
+    @Transactional
     public void eliminarCuenta(Usuario usuario) {
         Long uid = usuario.getId();
 

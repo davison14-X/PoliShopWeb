@@ -11,6 +11,7 @@ import co.edu.pcjic.polishop.service.ProductoService;
 import co.edu.pcjic.polishop.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -230,6 +231,23 @@ public class PanelController {
         usuarioService.actualizarPerfil(usuario, nombre, apellido);
         ra.addFlashAttribute("exito", "Datos personales actualizados correctamente.");
         return "redirect:/panel?tab=cuenta";
+    }
+
+    // ── Cambiar contraseña (responde JSON para el modal) ────
+    @ResponseBody
+    @PostMapping("/cuenta/contrasena")
+    public ResponseEntity<java.util.Map<String, String>> cambiarContrasena(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam String contrasenaActual,
+            @RequestParam String contrasenaNueva,
+            @RequestParam String contrasenaConfirmar) {
+        Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
+        try {
+            usuarioService.cambiarContrasena(usuario, contrasenaActual, contrasenaNueva, contrasenaConfirmar);
+            return ResponseEntity.ok(java.util.Map.of("ok", "Contraseña actualizada correctamente."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
     }
 
     // ── Eliminar cuenta ───────────────────────────────────────

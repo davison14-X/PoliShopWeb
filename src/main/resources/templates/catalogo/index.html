@@ -22,7 +22,8 @@
             </div>
             <div class="self-start sm:self-center">
                 <span class="ps-badge">
-                    <span th:text="${totalResultados} + ' ' + (${totalResultados} == 1 ? 'emprendimiento encontrado' : 'emprendimientos encontrados')">
+                    <span id="catalog-count-badge"
+                          th:text="${totalResultados} + ' ' + (${totalResultados} == 1 ? 'emprendimiento encontrado' : 'emprendimientos encontrados')">
                       0 emprendimientos encontrados
                     </span>
                 </span>
@@ -80,8 +81,9 @@
         </form>
 
         <!-- Estado vacio -->
-        <div th:if="${#lists.isEmpty(emprendimientos)}"
-             class="text-center py-16 ps-surface rounded-2xl p-8" style="border-style: dashed;">
+        <div id="catalog-empty"
+             th:class="${#lists.isEmpty(emprendimientos)} ? 'text-center py-16 ps-surface rounded-2xl p-8' : 'text-center py-16 ps-surface rounded-2xl p-8 hidden'"
+             style="border-style: dashed;">
             <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: var(--color-badge-bg); color: var(--color-text-muted);">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -97,8 +99,8 @@
         </div>
 
         <!-- GRILLA DE TARJETAS -->
-        <div th:unless="${#lists.isEmpty(emprendimientos)}"
-             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="catalog-grid"
+             th:class="${#lists.isEmpty(emprendimientos)} ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'">
 
             <article th:each="emp, iterStat : ${emprendimientos}"
                      class="ps-surface rounded-2xl overflow-hidden card-hover cursor-pointer flex flex-col group stagger-item">

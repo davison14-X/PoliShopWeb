@@ -52,6 +52,9 @@ public class Emprendimiento {
     @Column(nullable = false)
     private boolean activo = true;
 
+    @Column(name = "disponible_desde")
+    private LocalDateTime disponibleDesde;
+
     @Column(name = "disponible_hasta")
     private LocalDateTime disponibleHasta;
 
