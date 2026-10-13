@@ -169,7 +169,6 @@
                         id="imagenPrincipal"
                         name="imagen"
                         accept="image/*"
-                        onchange="(function(f){if(!f)return;var u=URL.createObjectURL(f);var w=document.getElementById('preview-wrapper');var p=document.getElementById('preview-imagen-principal');if(p)p.src=u;if(w)w.classList.remove('hidden');})(this.files[0])"
                         class="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
                         style="color: var(--color-text-secondary);"
                 />
@@ -181,22 +180,7 @@
             <!-- BOTONES DE ACCIÓN -->
             <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3" style="border-top: 1px solid var(--color-border);">
 
-                <div th:if="${modoEdicion}">
-                    <form th:action="@{/panel/producto/{id}/eliminar(id=${productoForm.id})}"
-                          method="post"
-                          onsubmit="return confirm('¿Seguro que deseas eliminar este producto? Esta acción no se puede deshacer.')">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <button type="submit"
-                                class="px-4 py-2 rounded-xl font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5" style="border: 1px solid rgba(239,68,68,0.3); color: #ef4444; background: transparent;">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            Eliminar producto
-                        </button>
-                    </form>
-                </div>
-
-                <div th:unless="${modoEdicion}"></div>
+                <div></div>
 
                 <div class="flex items-center gap-3">
                     <a th:href="@{/panel?tab=productos}"
@@ -220,6 +204,25 @@
         </form>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('imagenPrincipal');
+    if (!input) return;
+    input.addEventListener('change', function() {
+        var file = this.files && this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var wrapper = document.getElementById('preview-wrapper');
+            var img = document.getElementById('preview-imagen-principal');
+            if (img) img.src = e.target.result;
+            if (wrapper) wrapper.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    });
+});
+</script>
 
 <div th:replace="~{layout/base :: toast}"></div>
 <div th:replace="~{layout/base :: bottomNav}"></div>

@@ -78,7 +78,8 @@
                 </svg>
                 Perfil y Horarios
             </a>
-            <a th:href="@{/panel?tab=productos}"
+            <a th:if="${emp != null}"
+               th:href="@{/panel?tab=productos}"
                th:classappend="${tab == 'productos'} ? 'active' : ''"
                class="ps-tab flex items-center justify-center gap-2 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,6 +89,17 @@
                     Catalogo de Productos
                 </span>
             </a>
+            <span th:if="${emp == null}"
+                  class="ps-tab flex items-center justify-center gap-2 opacity-40 cursor-not-allowed"
+                  title="Crea tu emprendimiento primero">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+                Catalogo
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </span>
             <a th:href="@{/panel?tab=cuenta}"
                th:classappend="${tab == 'cuenta'} ? 'active' : ''"
                class="ps-tab flex items-center justify-center gap-2 cursor-pointer">
@@ -223,7 +235,6 @@
                              class="w-16 h-16 rounded-xl object-cover shrink-0" style="border: 1px solid var(--color-border);" alt="Logo preview"/>
                         <div class="flex-1">
                             <input type="file" id="logo" name="logo" accept="image/*"
-                                   onchange="(function(f){if(!f)return;var u=URL.createObjectURL(f);document.getElementById('preview-logo').src=u;var h=document.getElementById('header-logo-preview');if(h)h.src=u;})(this.files[0])"
                                    class="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold cursor-pointer"
                                    style="color: var(--color-text-secondary);"/>
                             <p class="text-[11px] mt-1" style="color: var(--color-text-muted);">PNG o JPG - max. 5 MB</p>
@@ -240,7 +251,6 @@
                              th:src="${emp?.portadaUrl} ?: '/img/placeholder-cover.jpg'"
                              class="w-full h-28 rounded-xl object-cover" style="border: 1px solid var(--color-border);" alt="Portada preview"/>
                         <input type="file" id="portada" name="portada" accept="image/*"
-                               onchange="(function(f){if(!f)return;document.getElementById('preview-portada').src=URL.createObjectURL(f);})(this.files[0])"
                                class="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold cursor-pointer"
                                style="color: var(--color-text-secondary);"/>
                         <p class="text-[11px]" style="color: var(--color-text-muted);">PNG o JPG - max. 5 MB - proporcion 3:1</p>
@@ -651,6 +661,30 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function previewFile(inputId, previewIds) {
+        var input = document.getElementById(inputId);
+        if (!input) return;
+        input.addEventListener('change', function() {
+            var file = this.files && this.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                previewIds.forEach(function(id) {
+                    var img = document.getElementById(id);
+                    if (img) img.src = e.target.result;
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    previewFile('logo', ['preview-logo', 'header-logo-preview']);
+    previewFile('portada', ['preview-portada']);
+});
+</script>
 
 <script>
 function cerrarModalContrasena() {

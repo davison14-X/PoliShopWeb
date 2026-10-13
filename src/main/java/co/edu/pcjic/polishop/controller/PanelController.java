@@ -76,6 +76,12 @@ public class PanelController {
         }
 
         model.addAttribute("categorias", categoriaRepo.findAll());
+
+        if ("productos".equals(tab) && emp == null) {
+            tab = "perfil";
+            model.addAttribute("error", "Debes crear tu emprendimiento antes de gestionar productos.");
+        }
+
         model.addAttribute("tab", tab);
         model.addAttribute("paginaActual", "cuenta".equals(tab) ? "cuenta" : "panel");
 
@@ -118,7 +124,14 @@ public class PanelController {
 
     // ── Nuevo producto ─────────────────────────────────────────
     @GetMapping("/producto/nuevo")
-    public String nuevoProductoForm(Model model) {
+    public String nuevoProductoForm(@AuthenticationPrincipal UserDetails userDetails,
+                                    RedirectAttributes ra, Model model) {
+        Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
+        Emprendimiento emp = emprendimientoService.findByUsuario(usuario);
+        if (emp == null) {
+            ra.addFlashAttribute("error", "Debes crear tu emprendimiento antes de agregar productos.");
+            return "redirect:/panel?tab=perfil";
+        }
         model.addAttribute("productoForm", new ProductoForm());
         model.addAttribute("modoEdicion", false);
         model.addAttribute("paginaActual", "panel");
@@ -142,6 +155,10 @@ public class PanelController {
 
         Usuario usuario = usuarioService.findByCorreo(userDetails.getUsername());
         Emprendimiento emp = emprendimientoService.findByUsuario(usuario);
+        if (emp == null) {
+            ra.addFlashAttribute("error", "Debes crear tu emprendimiento antes de agregar productos.");
+            return "redirect:/panel?tab=perfil";
+        }
         productoService.guardar(productoForm, emp);
         ra.addFlashAttribute("exito", "Producto creado correctamente.");
         return "redirect:/panel?tab=productos";
